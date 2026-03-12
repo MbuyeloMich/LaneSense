@@ -1,117 +1,119 @@
-# LaneSense - Unscented Kalman Filter for Highway Vehicle Tracking
+# Unscented Kalman Filter for Highway
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/mbuyelo-mich/NameSense)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+## 1. Overview
+This project implements an Unscented Kalman Filter to estimate the state of multiple cars on a highway using noisy *lidar* and *radar* measurements. We'll then evaluate the quality of our filter using RMSE values.
 
-## Overview
+<img src="assets/ukf_highway_tracked.gif" width="700" height="400" />
 
-**NameSense** is a high-performance C++ implementation of an **Unscented Kalman Filter (UKF)** designed for **multi-vehicle tracking on highways**. It fuses noisy **LIDAR** and **RADAR** measurements to accurately estimate vehicle states (position, velocity, heading, yaw rate) in real-time.
+`main.cpp` is using `highway.h` to create a straight 3 lane highway environment with 3 traffic cars and the main ego car at the center. The viewer scene is centered around the ego car and the coordinate system is relative to the ego car as well. The ego car is green while the other traffic cars are blue. The traffic cars will be accelerating and altering their steering to change lanes. Each of the traffic car's has its own UKF object generated for it, and will update each indidual one during every time step. 
 
-<img src=\"assets/ukf_highway_tracked.gif\" width=\"700\" height=\"400\" alt=\"NameSense UKF Tracking Demo\"/>
+The red spheres above cars represent the (x,y) lidar detection and the purple lines show the radar measurements with the velocity magnitude along the detected angle. The Z axis is not taken into account for tracking, so we're only tracking along the X/Y axis in this project.
 
-**Key Features:**
-- Tracks multiple vehicles (ego + 3 traffic cars) across 3 highway lanes
-- Real-time **RMSE evaluation** against ground truth
-- **3D visualization** using PCL (optional GUI mode)
-- **Headless mode** for performance testing
-- Handles nonlinear motion models and sensor fusion challenges
 
-<img src=\"assets/ukf_highway_result.png\" width=\"700\" height=\"400\" alt=\"NameSense RMSE Results\"/>
+## 2. Table of Contents
+- [Project Instructions](#build)
+- [UKF Implementation](#implementation)
+- [Acknowledgements](#acknowledgements)
 
-## Relevance to SANRAL & Intelligent Transport Systems
 
-NameSense addresses core challenges in **South African National Roads Agency (SANRAL)** intelligent transportation systems:
-- **Traffic flow monitoring** on high-speed highways (N1, N3, etc.)
-- **Incident detection** through accurate vehicle tracking
-- **Advanced Driver Assistance Systems (ADAS)** integration
-- Scalable to production LIDAR/RADAR deployments
+## 3. Project Instructions <a name="build"></a>
+The main program can be built and ran by doing the following from the project top directory.
 
-## Technical Highlights
+1. Clone this repo with LFS, which can be done in two ways:
+  1. `git lfs clone https://github.com/moorissa/lidar-obstacle-detector.git` OR
+  2. Alternatively:
+  ```bash
+    git clone https://github.com/moorissa/lidar-obstacle-detector.git
+    cd lidar-obstacle-detector  # ensure no duplicated names in the same directory
+    git lfs pull
+  ```
+  If LFS continues causing (submission) issues:
+   - Upload PCD files to a cloud service (Google Drive, Dropbox) and include download links
+   - Use smaller sample PCD files that don't require LFS
+   - Compress the PCD files if possible
+2. Make a build directory: `mkdir build && cd build`
+3. Compile: `cmake .. && make -j`
+4. Run it: `./ukf_highway`
 
-| Feature | Implementation Details |
-|---------|------------------------|
-| **UKF Algorithm** | 5D state vector `[px, py, v, yaw, yawd]` + 2D process noise |
-| **Sensor Fusion** | LIDAR (Cartesian) + RADAR (Polar) with nonlinear measurement models |
-| **Sigma Points** | 15 augmented sigma points with UKF spreading parameter λ=3-n_aug |
-| **Motion Model** | Handles turning (v/yawd) and straight-line motion with process noise |
-| **Performance** | Real-time RMSE: X<0.30m, Y<0.16m, Vx<0.95m/s, Vy<0.70m/s |
-| **Visualization** | PCL 3D viewer with LIDAR spheres, RADAR rays, future path prediction |
+In short, you can rerun it with: `rm -rf ./* && cmake .. && make && ./ukf_highway`
 
-## Applications
+<img src="assets/ukf_highway.png" width="700" height="400" />
 
-1. **Traffic Flow Monitoring** - Vehicle counting, speed profiling, lane occupancy
-2. **Incident Detection** - Collision avoidance, abnormal behavior detection
-3. **Intelligent Transport Systems** - Adaptive traffic signals, variable speed limits
-4. **Autonomous Vehicles** - Sensor fusion for perception pipeline
-5. **SANRAL Infrastructure** - Highway safety analytics, congestion management
+#### Dependencies
+* cmake >= 3.10
+  * All OSes: [click here for installation instructions](https://cmake.org/install/)
+* make >= 3.8
+  * Linux: make is installed by default on most Linux distros
+  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
+  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
+* gcc/g++ >= 5.4
+  * Linux: gcc / g++ is installed by default on most Linux distros
+  * Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
+  * Windows: recommend using [MinGW](http://www.mingw.org/)
+* PCL >= 1.10
+  * [Documentation](https://pointclouds.org/downloads/)
 
-## 🚀 Quick Start
+#### Currently used (2025 version):
+* MacOS: Sequoia 15.5
+* cmake: 3.31.7
+* GNU make: 3.81
+* gcc: 
+  ```
+  Target: arm64-apple-darwin24.5.0
+  Thread model: posix
+  InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+  ```
+* pcl: stable 1.15.0
 
-### Prerequisites
-- CMake ≥ 3.10
-- C++17 compiler (GCC ≥ 7, MSVC 2019+, Clang ≥ 5)
-- [PCL ≥ 1.10](https://pointclouds.org/downloads/) *(GUI only)*
-- Eigen3 *(bundled)*
+#### Generating Additional Data
+If you'd like to generate your own radar and lidar modify the code in `highway.h` to alter the cars. Check out `tools.cpp` to
+change how measurements are taken, for instance lidar markers could be the (x,y) center of bounding boxes by scanning the PCD environment and performing clustering.
 
-### Windows (PowerShell)
-```powershell
-.\\build.ps1
-.\\build\\Release\\ukf_highway.exe  # Headless
-.\\build\\Release\\ukf_highway_gui.exe  # GUI
-```
 
-### Linux/macOS
-```bash
-mkdir build &amp;&amp; cd build
-cmake .. &amp;&amp; make -j$(nproc)
-./ukf_highway                # Headless test
-./ukf_highway_gui            # Interactive 3D visualization
-```
+## 4. UKF Implementation <a name="implementation"></a>
 
-### Available Scripts
-| Script | Purpose |
-|--------|---------|
-| `build.bat` / `build.ps1` | Full build (headless + GUI) |
-| `run_ukf.bat` | Run headless simulation |
-| `simple_build.bat` | Minimal build |
-| `visualize_ukf.py` | Post-process results |
+## 4.1. Parameters
+File(s): `highway.h` - there are a number of parameters we can modify for debugging purpose.
+- `trackCars` list can toggle on/off cars for UKF object to track
+- `projectedTime` and `projectedSteps` controls the visualization of predicted position in the future
+- `visualize_pcd` sets the visualization of Lidar point cloud data
 
-## 📊 Expected Results
-
-```
-Final RMSE:
-  X position:  0.12 m
-  Y position:  0.08 m
-  X velocity:  0.45 m/s
-  Y velocity:  0.32 m/s
-Result: PASSED ✓
-```
-
-**Thresholds:** `[0.30, 0.16, 0.95, 0.70]`
-
-## 🛠️ Customization
-
-Modify `src/highway.h`:
-```cpp
-std::vector<bool> trackCars = {true, true, true};  // Enable/disable tracking
+```c++
+// Set which cars to track with UKF
+std::vector<bool> trackCars = {true,true,true};
+// Visualize sensor measurements
 bool visualize_lidar = true;
 bool visualize_radar = true;
-double projectedTime = 2.0;  // Future prediction horizon
-int projectedSteps = 20;
+bool visualize_pcd = false;
+// Predict path in the future using UKF
+double projectedTime = 0;
+int projectedSteps = 0;
 ```
 
-## 📈 Performance Metrics
+## 4.2. Code Walkthrough
+Instead of using mathematical approximations (like linearization), the UKF approach:
+1. Samples the uncertainty space with carefully chosen "sigma points"
+2. Runs each sample through the exact nonlinear motion model
+3. Statistically combines the results to get the predicted mean and covariance
 
-| Metric | Value | Threshold | Status |
-|--------|-------|-----------|--------|
-| RMSE X | 0.12m | ≤ 0.30m | ✅ PASS |
-| RMSE Y | 0.08m | ≤ 0.16m | ✅ PASS |
-| RMSE Vx | 0.45m/s | ≤ 0.95m/s | ✅ PASS |
-| RMSE Vy | 0.32m/s | ≤ 0.70m/s | ✅ PASS |
+This gives much more accurate predictions for nonlinear systems compared to traditional Kalman filters. In the following steps, we will learn that `ProcessMeasurement` function = Update cycle that:
+- Takes in new sensor data (LIDAR or RADAR measurement)
+- Calls `Prediction()` first, then calls the appropriate update function (`UpdateLidar` or `UpdateRadar`)
+- This is the complete measurement processing cycle
 
-## Disclaimer
+In this case, `Prediction` = Predict step only of the predict-update cycle. It uses motion model to estimate where object should be at current time, and no sensor data involved - purely physics/motion-based prediction.
 
-**Educational Project**: This is an educational implementation of UKF for learning purposes. It is not affiliated with SANRAL or any commercial entity. For production use, consult certified engineering solutions.
+#### The Full Cycle
+Overall, we're implementing `ProcessMeasurement()` function that does:
+1. `Prediction(dt)`      -> "Where should object be now?" (physics)
+2. `UpdateLidar/Radar()` -> "Correct prediction with sensor data"
+
+Process Measurement basically manages the timing and calls both steps in sequence whenever new sensor data arrives -- which aligns with the standard Kalman filter pattern:
+1. *Predict:* Use motion model to forecast state
+2. *Update:* Use sensor measurement to correct the forecast
+
+
+### 1. Initialize UKF attributes
 File(s): `ukf.cpp`
 - dimension of the state vector `n_x_`
 - state vector `x_`
@@ -187,9 +189,8 @@ On the left-hand side, the root mean squared errors (RMSE) for position `(x,y)` 
 
 
 
-## Disclaimer
+## Ackowledgements <a name="acknowledgements"></a>
+* [Udacity Sensor Fusion Program](https://www.udacity.com/course/sensor-fusion-engineer-nanodegree--nd313)
 
-**Educational Project**: This is an educational implementation of UKF for learning purposes. It is not affiliated with SANRAL or any commercial entity. For production use, consult certified engineering solutions.
-
-
+For any questions or feedback, feel free to email [moorissa.tjokro@columbia.edu](mailto:moorissa.tjokro@columbia.edu).
 
