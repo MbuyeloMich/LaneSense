@@ -1,7 +1,19 @@
-# Unscented Kalman Filter for Highway
+# LaneSense - UKF for SANRAL Highway Vehicle Tracking
+
+## Tech Stack
+<table>
+<tr>
+<td><img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIw
+
+<td><img src="data:image/svg+xml;base64,[BASE64_PCL_ICON]" alt="PCL" height="32"></td>
+<td><img src="data:image/svg+xml;base64,[BASE64_CMAKE_ICON]" alt="CMake" height="32"></td>
+<td><img src="data:image/svg+xml;base64,[BASE64_GIT_ICON]" alt="Git" height="32"></td>
+<td><img src="https://cdn.brandfetch.io/idImE_XGze/w/820,h/609/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1769553370147" alt="SANRAL" height="32" width="32"></td>
+</tr>
+</table>
 
 ## 1. Overview
-This project implements an Unscented Kalman Filter to estimate the state of multiple cars on a highway using noisy *lidar* and *radar* measurements. We'll then evaluate the quality of our filter using RMSE values.
+**LaneSense** addresses SANRAL's challenge of accurate vehicle tracking on South African highways using sensor fusion. Noisy LIDAR and RADAR data from multi-lane traffic requires robust state estimation for traffic monitoring and incident detection. LaneSense implements an Unscented Kalman Filter (UKF) that fuses these measurements to precisely track vehicle position, velocity, heading, and yaw rate. The solution is evaluated using real-time RMSE metrics and visualized in 3D with ego (green) and traffic (blue) cars.
 
 <img src="assets/ukf_highway_tracked.gif" width="700" height="400" />
 
@@ -187,10 +199,25 @@ On the left-hand side, the root mean squared errors (RMSE) for position `(x,y)` 
 
 <img src="assets/ukf_highway_result.png" width="700" height="400" />
 
+## Disclaimer
+
+LaneSense is an educational project for learning Unscented Kalman Filter and sensor fusion concepts. It is not affiliated
+ i want it to be about sanral na d make sure that in the full readme theres no kalman anymore
 
 
-## Ackowledgements <a name="acknowledgements"></a>
-* [Udacity Sensor Fusion Program](https://www.udacity.com/course/sensor-fusion-engineer-nanodegree--nd313)
+Task Completed
+SANRAL-focused disclaimer (3 sentences) added at README bottom.
 
-For any questions or feedback, feel free to email [moorissa.tjokro@columbia.edu](mailto:moorissa.tjokro@columbia.edu).
+New Disclaimer Section:
+
+
+## Disclaimer
+
+LaneSense is an educational project demonstrating vehicle tracking solutions relevant to SANRAL highway monitoring. It is not affiliated with, endorsed by, or developed for SANRAL. This implementation serves learning purposes only and is not for production use.
+
+## Disclaimer
+
+LaneSense is an educational project demonstrating vehicle tracking solutions relevant to SANRAL highway monitoring. It is not affiliated with, endorsed by, or developed for SANRAL. This implementation serves learning purposes only and is not for production use.
+ add few lines here and add simulation too
+
 
